@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-MPXXKLJ9');</script>
+    <!-- End Google Tag Manager -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>お問い合わせ完了 | 株式会社ビーワン</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+JP:wght@100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ===== RESET & BASE ===== */
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        font-weight: 400;
+        background: #f5f7fb;
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ===== NAVBAR ===== */
+      .navbar {
+        background: #f5f5f5;
+        padding: 15px 20px;
+        display: flex;
+        gap: 25px;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .navbar .tag p {
+        color: #1877e2;
+        font-weight: 700;
+        font-size: 18px;
+      }
+      .navbar .tel {
+        font-weight: 700;
+        font-size: 18px;
+        color: #333;
+        letter-spacing: 1px;
+      }
+      .navbar .tel i {
+        color: #1877e2;
+        margin-right: 6px;
+      }
+
+      /* ===== MAIN WRAPPER ===== */
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 60px 20px 100px;
+      }
+
+      /* ===== HERO BAND ===== */
+      .thanks-hero {
+        width: 100%;
+        background: linear-gradient(135deg, #1877e2 0%, #3b9eff 100%);
+        text-align: center;
+        padding: 56px 20px 48px;
+        position: relative;
+        overflow: hidden;
+      }
+      .thanks-hero::before {
+        content: "";
+        position: absolute;
+        top: -60px; right: -80px;
+        width: 340px; height: 340px;
+        background: rgba(255,255,255,0.07);
+        border-radius: 50%;
+      }
+      .thanks-hero::after {
+        content: "";
+        position: absolute;
+        bottom: -80px; left: -60px;
+        width: 260px; height: 260px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+      }
+      .thanks-hero .check-circle {
+        width: 80px; height: 80px;
+        background: #fff;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 22px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        animation: popIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .thanks-hero .check-circle i {
+        font-size: 36px;
+        color: #1877e2;
+      }
+      .thanks-hero h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 2px;
+        animation: slideUp 0.6s 0.1s ease both;
+      }
+      .thanks-hero p {
+        margin-top: 12px;
+        font-size: 16px;
+        color: rgba(255,255,255,0.85);
+        line-height: 1.8;
+        animation: slideUp 0.6s 0.2s ease both;
+      }
+
+      /* ===== CONTENT AREA ===== */
+      .content {
+        width: 100%;
+        max-width: 760px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        margin-top: 40px;
+      }
+
+      /* ===== EMAIL SENT BADGE ===== */
+      .email-sent-wrap {
+        text-align: center;
+        animation: slideUp 0.6s 0.3s ease both;
+      }
+      .email-sent-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f0fdf4;
+        border: 1px solid #86efac;
+        color: #16a34a;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 20px;
+      }
+
+      /* ===== NEXT STEPS ===== */
+      .steps-section {
+        animation: slideUp 0.6s 0.4s ease both;
+      }
+      .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .section-heading .bar {
+        width: 5px;
+        height: 36px;
+        background: #1877e2;
+        border-radius: 3px;
+        flex-shrink: 0;
+        position: relative;
+      }
+      .section-heading .bar::after {
+        content: "";
+        position: absolute;
+        top: 0; right: -5px;
+        height: 100%; width: 40%;
+        background: #1877e2;
+      }
+      .section-heading h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1877e2;
+        font-family: "Inter", sans-serif;
+        letter-spacing: 2px;
+      }
+
+      .steps-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+      }
+      .steps-list::before {
+        content: "";
+        position: absolute;
+        left: 34px;
+        top: 50px;
+        bottom: 50px;
+        width: 2px;
+        background: linear-gradient(to bottom, #1877e2, #b3d0f7);
+        border-radius: 2px;
+      }
+
+      .step-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px 28px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        position: relative;
+        z-index: 1;
+        margin-bottom: 16px;
+        border-left: 4px solid transparent;
+        transition: border-color 0.3s, transform 0.3s;
+      }
+      .step-item:hover {
+        border-left-color: #1877e2;
+        transform: translateX(4px);
+      }
+      .step-item.active {
+        border-left-color: #fedf43;
+        background: #fffdf0;
+      }
+      .step-num {
+        width: 44px; height: 44px;
+        min-width: 44px;
+        border-radius: 50%;
+        background: #1877e2;
+        color: #fff;
+        font-family: "Rubik", sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 3px 10px rgba(24,119,226,0.3);
+      }
+      .step-item.active .step-num {
+        background: #fedf43;
+        color: #1877e2;
+        box-shadow: 0 3px 10px rgba(254,223,67,0.4);
+      }
+      .step-body h3 {
+        font-size: 17px;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 6px;
+      }
+      .step-body p {
+        font-size: 14px;
+        color: #555;
+        line-height: 1.8;
+      }
+      .step-badge {
+        display: inline-block;
+        background: #fedf43;
+        color: #1877e2;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        margin-left: 8px;
+        vertical-align: middle;
+        letter-spacing: 0.5px;
+      }
+
+      /* ===== CONTACT INFO ===== */
+      .contact-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 28px 32px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        animation: slideUp 0.6s 0.5s ease both;
+      }
+      .contact-card .icon-box {
+        width: 52px; height: 52px;
+        background: #1877e2;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        font-size: 22px;
+        color: #fff;
+      }
+      .contact-card .info h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 6px;
+      }
+      .contact-card .info p {
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.7;
+      }
+      .contact-card .tel-number {
+        font-family: "Rubik", sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: #1877e2;
+        margin-top: 4px;
+        letter-spacing: 1px;
+      }
+
+      /* ===== FOOTER ===== */
+      footer {
+        background: #414141;
+        color: white;
+        text-align: center;
+        padding: 50px 20px 30px;
+      }
+      footer p {
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 1.8;
+        margin-bottom: 6px;
+      }
+      footer small {
+        color: rgba(255,255,255,0.7);
+        font-size: 13px;
+        margin-top: 16px;
+        display: block;
+      }
+
+      /* ===== ANIMATIONS ===== */
+      @keyframes popIn {
+        0%   { transform: scale(0.5); opacity: 0; }
+        70%  { transform: scale(1.1); }
+        100% { transform: scale(1);   opacity: 1; }
+      }
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ===== RESPONSIVE ===== */
+      @media (max-width: 600px) {
+        .thanks-hero h1 { font-size: 20px; }
+        .step-item { padding: 18px 16px; gap: 16px; }
+        .steps-list::before { left: 26px; }
+        .contact-card { flex-direction: column; text-align: center; }
+        .navbar .tel { font-size: 14px; }
+        .navbar .tag p { font-size: 14px; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPXXKLJ9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+      <div class="tag">
+        <p>軽貨物ルート 配送専門</p>
+      </div>
+      <div class="tel">
+        <i class="fa-solid fa-phone"></i>080-4339-2573
+      </div>
+    </header>
+
+    <!-- HERO BAND -->
+    <section class="thanks-hero">
+      <div class="check-circle">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h1>お問い合わせを受け付けました</h1>
+      <p>
+        ご連絡いただきありがとうございます。<br />
+        内容を確認の上、担当者より2営業日以内にご連絡いたします。
+      </p>
+    </section>
+
+    <!-- MAIN -->
+    <main>
+      <div class="content">
+
+        <!-- メール送信済みバッジ -->
+        <div class="email-sent-wrap">
+          <span class="email-sent-badge">
+            <i class="fa-solid fa-envelope-circle-check"></i>
+            確認メールを送信しました
+          </span>
+        </div>
+
+        <!-- 次のステップ -->
+        <div class="steps-section">
+          <div class="section-heading">
+            <div class="bar"></div>
+            <h2>今後の流れ</h2>
+          </div>
+
+          <div class="steps-list">
+
+            <div class="step-item active">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <h3>お問い合わせ完了 <span class="step-badge">現在ここ</span></h3>
+                <p>
+                  フォームのご送信が完了しました。<br />
+                  ご入力のメールアドレスに確認メールをお送りしています。
+                </p>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <h3>ヒアリング・ご提案</h3>
+                <p>
+                  担当者より2営業日以内にご連絡いたします。<br />
+                  配送ルート・頻度・課題などを詳しくヒアリングし、<br />
+                  コスト比較・運用改善案を数字で見える化してご提案します。<br />
+                  <strong>オンラインでの面談も可能です。</strong>
+                </p>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <h3>契約・運用開始</h3>
+                <p>
+                  ご納得いただけましたら、契約を締結し運用を開始。<br />
+                  担当者の同行も可能です。スムーズな導入をサポートします。
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 電話でのお問い合わせ -->
+        <div class="contact-card">
+          <div class="icon-box">
+            <i class="fa-solid fa-phone"></i>
+          </div>
+          <div class="info">
+            <h3>お急ぎの場合はお電話でもどうぞ</h3>
+            <p>平日 9:00〜18:00 受付</p>
+            <div class="tel-number">080-4339-2573</div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>株式会社ビーワン</p>
+      <p style="font-size:15px; font-weight:400;">千葉県柏市松ヶ崎564-7 メゾンドネオ柏104</p>
+      <small>© 2025 株式会社ビーワン All Rights Reserved.</small>
+    </footer>
+
+  </body>
+</html>
