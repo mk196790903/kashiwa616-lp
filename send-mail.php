@@ -207,25 +207,38 @@ function performSpamCheck($data) {
         $reasons[] = 'disposable_email(' . $domain . ')';
     }
 
-    // メッセージ内のURL数チェック
+    // メッセージ/お品物内のURL数チェック
     $message = $data['message'] ?? '';
-    $urlCount = preg_match_all('/https?:\/\/[^\s]+/', $message);
+    $itemDetail = $data['item_detail'] ?? '';
+    $urlCount = preg_match_all('/https?:\/\/[^\s]+/', $message . "\n" . $itemDetail);
     if ($urlCount > 3) {
         $score += 20;
         $reasons[] = 'too_many_urls(' . $urlCount . ')';
     }
 
     // 日本語を含むか（日本向けフォーム）
-    $combinedText = ($data['name'] ?? '') . ($data['company'] ?? '') . ($data['message'] ?? '');
+    $delivery = $data['delivery_place'] ?? '';
+    if (is_array($delivery)) {
+        $delivery = implode(',', array_map('strval', $delivery));
+    }
+    $combinedText = (
+        ($data['name'] ?? '') .
+        ($data['company'] ?? '') .
+        ($data['pickup_place'] ?? '') .
+        ($delivery ?? '') .
+        ($data['item_detail'] ?? '') .
+        ($data['industry'] ?? '') .
+        ($data['message'] ?? '')
+    );
     if (!preg_match('/[\x{3040}-\x{309F}\x{30A0}-\x{30FF}\x{4E00}-\x{9FFF}]/u', $combinedText)) {
         $score += 15;
         $reasons[] = 'no_japanese_chars';
     }
 
-    // 業種の検証
+    // 業種の検証（フォームに業種が無い場合もあるため、入力がある時のみチェック）
     $allowedIndustries = defined('ALLOWED_INDUSTRIES') ? unserialize(ALLOWED_INDUSTRIES) : [];
     $industry = $data['industry'] ?? '';
-    if (!empty($allowedIndustries) && !in_array($industry, $allowedIndustries)) {
+    if (!empty($industry) && !empty($allowedIndustries) && !in_array($industry, $allowedIndustries)) {
         $score += 20;
         $reasons[] = 'invalid_industry';
     }
@@ -354,8 +367,15 @@ function generateAdminMailHTML($data, $inquiryNumber) {
     $email = htmlspecialchars($data['email'], ENT_QUOTES, 'UTF-8');
     $phone = htmlspecialchars($data['phone'] ?? '（未入力）', ENT_QUOTES, 'UTF-8');
     $homepage = htmlspecialchars($data['homepage'] ?? '（未入力）', ENT_QUOTES, 'UTF-8');
-    $industry = htmlspecialchars($data['industry'], ENT_QUOTES, 'UTF-8');
-    $message = nl2br(htmlspecialchars($data['message'], ENT_QUOTES, 'UTF-8'));
+    $pickup = htmlspecialchars($data['pickup_place'] ?? '（未入力）', ENT_QUOTES, 'UTF-8');
+    $deliveryRaw = $data['delivery_place'] ?? '';
+    if (is_array($deliveryRaw)) {
+        $deliveryRaw = implode('、', array_map('strval', $deliveryRaw));
+    }
+    $delivery = htmlspecialchars($deliveryRaw ?: '（未入力）', ENT_QUOTES, 'UTF-8');
+    $itemDetail = nl2br(htmlspecialchars($data['item_detail'] ?? '（未入力）', ENT_QUOTES, 'UTF-8'));
+    $industry = htmlspecialchars($data['industry'] ?? '（未入力）', ENT_QUOTES, 'UTF-8');
+    $message = nl2br(htmlspecialchars($data['message'] ?? '（未入力）', ENT_QUOTES, 'UTF-8'));
     $spamScore = $data['spam_score'] ?? 0;
     $datetime = date('Y年m月d日 H:i');
     $ssUrl = 'https://docs.google.com/spreadsheets/d/1r7VY1dhQsOB3DtB_b_YRLl2Kkrx0qgmUM2HdWzgFlmI/edit';
@@ -387,6 +407,9 @@ function generateAdminMailHTML($data, $inquiryNumber) {
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">メール</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;"><a href="mailto:' . $email . '" style="color:#3b82f6;">' . $email . '</a></td></tr>';
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">電話番号</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $phone . '</td></tr>';
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">HP</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $homepage . '</td></tr>';
+    $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">引取場所</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $pickup . '</td></tr>';
+    $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">納品場所</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $delivery . '</td></tr>';
+    $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">お品物</td><td style="padding:10px 0;color:#1f2937;line-height:1.8;border-bottom:1px solid #e5e7eb;">' . $itemDetail . '</td></tr>';
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">業種</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $industry . '</td></tr>';
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;">内容</td><td style="padding:10px 0;color:#1f2937;line-height:1.8;">' . $message . '</td></tr>';
     $html .= '</table></td></tr>';
@@ -419,10 +442,17 @@ function generateAdminMailPlain($data, $inquiryNumber) {
     $text .= "会社名：{$data['company']}\n";
     $text .= "メール：{$data['email']}\n";
     $text .= "電話番号：{$phone}\n";
+    $deliveryRaw = $data['delivery_place'] ?? '';
+    if (is_array($deliveryRaw)) {
+        $deliveryRaw = implode('、', array_map('strval', $deliveryRaw));
+    }
     $text .= "HP：{$homepage}\n";
-    $text .= "業種：{$data['industry']}\n\n";
+    $text .= "引取場所：" . ($data['pickup_place'] ?? '（未入力）') . "\n";
+    $text .= "納品場所：" . ($deliveryRaw ?: '（未入力）') . "\n";
+    $text .= "お品物：\n" . ($data['item_detail'] ?? '（未入力）') . "\n\n";
+    $text .= "業種：" . ($data['industry'] ?? '（未入力）') . "\n\n";
     $text .= "【お困りごと・お問い合わせ内容】\n";
-    $text .= "{$data['message']}\n\n";
+    $text .= ($data['message'] ?? '（未入力）') . "\n\n";
     $text .= "──────────────────────────────\n";
     $text .= "▼ スプレッドシートで確認\n";
     $text .= "{$ssUrl}\n";
@@ -441,8 +471,15 @@ function generateAutoReplyHTML($data, $inquiryNumber) {
     $email = htmlspecialchars($data['email'], ENT_QUOTES, 'UTF-8');
     $phone = htmlspecialchars($data['phone'] ?? '（未入力）', ENT_QUOTES, 'UTF-8');
     $homepage = htmlspecialchars($data['homepage'] ?? '（未入力）', ENT_QUOTES, 'UTF-8');
-    $industry = htmlspecialchars($data['industry'], ENT_QUOTES, 'UTF-8');
-    $message = nl2br(htmlspecialchars($data['message'], ENT_QUOTES, 'UTF-8'));
+    $pickup = htmlspecialchars($data['pickup_place'] ?? '（未入力）', ENT_QUOTES, 'UTF-8');
+    $deliveryRaw = $data['delivery_place'] ?? '';
+    if (is_array($deliveryRaw)) {
+        $deliveryRaw = implode('、', array_map('strval', $deliveryRaw));
+    }
+    $delivery = htmlspecialchars($deliveryRaw ?: '（未入力）', ENT_QUOTES, 'UTF-8');
+    $itemDetail = nl2br(htmlspecialchars($data['item_detail'] ?? '（未入力）', ENT_QUOTES, 'UTF-8'));
+    $industry = htmlspecialchars($data['industry'] ?? '（未入力）', ENT_QUOTES, 'UTF-8');
+    $message = nl2br(htmlspecialchars($data['message'] ?? '（未入力）', ENT_QUOTES, 'UTF-8'));
     $datetime = date('Y年m月d日 H:i');
 
     $html = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"></head>';
@@ -475,6 +512,9 @@ function generateAutoReplyHTML($data, $inquiryNumber) {
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">メール</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $email . '</td></tr>';
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">電話番号</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $phone . '</td></tr>';
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">HP</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $homepage . '</td></tr>';
+    $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">引取場所</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $pickup . '</td></tr>';
+    $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">納品場所</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $delivery . '</td></tr>';
+    $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">お品物</td><td style="padding:10px 0;color:#1f2937;line-height:1.8;border-bottom:1px solid #e5e7eb;">' . $itemDetail . '</td></tr>';
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;border-bottom:1px solid #e5e7eb;">業種</td><td style="padding:10px 0;color:#1f2937;border-bottom:1px solid #e5e7eb;">' . $industry . '</td></tr>';
     $html .= '<tr><td style="padding:10px 0;color:#6b7280;vertical-align:top;">内容</td><td style="padding:10px 0;color:#1f2937;line-height:1.8;">' . $message . '</td></tr>';
     $html .= '</table>';
@@ -514,10 +554,17 @@ function generateAutoReplyPlain($data, $inquiryNumber) {
     $text .= "会社名：{$data['company']}\n";
     $text .= "メール：{$data['email']}\n";
     $text .= "電話番号：{$phone}\n";
+    $deliveryRaw = $data['delivery_place'] ?? '';
+    if (is_array($deliveryRaw)) {
+        $deliveryRaw = implode('、', array_map('strval', $deliveryRaw));
+    }
     $text .= "HP：{$homepage}\n";
-    $text .= "業種：{$data['industry']}\n\n";
+    $text .= "引取場所：" . ($data['pickup_place'] ?? '（未入力）') . "\n";
+    $text .= "納品場所：" . ($deliveryRaw ?: '（未入力）') . "\n";
+    $text .= "お品物：\n" . ($data['item_detail'] ?? '（未入力）') . "\n\n";
+    $text .= "業種：" . ($data['industry'] ?? '（未入力）') . "\n\n";
     $text .= "【お困りごと・お問い合わせ内容】\n";
-    $text .= "{$data['message']}\n\n";
+    $text .= ($data['message'] ?? '（未入力）') . "\n\n";
     $text .= "──────────────────────────────\n\n";
     $text .= "※ このメールは自動送信されています。\n";
     $text .= "※ このメールにお心当たりのない場合は、\n";
@@ -586,6 +633,12 @@ try {
         'email' => trim($_POST['email'] ?? ''),
         'phone' => sanitizeInput($_POST['phone'] ?? ''),
         'homepage' => sanitizeInput($_POST['homepage'] ?? ''),
+        // 現行フォーム（見積もり用）
+        'pickup_place' => sanitizeInput($_POST['pickup_place'] ?? ''),
+        'delivery_place' => $_POST['delivery_place'] ?? [],
+        'item_detail' => sanitizeInput($_POST['item_detail'] ?? ''),
+        'consent' => $_POST['consent'] ?? '',
+        // 旧フォーム互換（存在しない場合もある）
         'industry' => sanitizeInput($_POST['industry'] ?? ''),
         'message' => sanitizeInput($_POST['message'] ?? ''),
         'recaptcha_token' => $_POST['recaptcha_token'] ?? '',
@@ -595,12 +648,24 @@ try {
     ];
 
     // 必須フィールドチェック
-    $required = ['name', 'company', 'email', 'industry', 'message'];
+    $required = ['name', 'company', 'email', 'pickup_place', 'item_detail'];
     foreach ($required as $field) {
         if (empty($formData[$field])) {
             echo json_encode(['success' => false, 'message' => '必須項目を入力してください。']);
             exit;
         }
+    }
+
+    // 納品場所（複数）
+    if (!is_array($formData['delivery_place']) || count(array_filter($formData['delivery_place'], 'strlen')) === 0) {
+        echo json_encode(['success' => false, 'message' => '必須項目を入力してください。']);
+        exit;
+    }
+
+    // 同意チェック（未送信のケースは弾く）
+    if (empty($formData['consent'])) {
+        echo json_encode(['success' => false, 'message' => '必須項目を入力してください。']);
+        exit;
     }
 
     // メールアドレスバリデーション
@@ -658,6 +723,9 @@ try {
         'email' => $formData['email'],
         'phone' => $formData['phone'],
         'homepage' => $formData['homepage'],
+        'pickup_place' => $formData['pickup_place'],
+        'delivery_place' => is_array($formData['delivery_place']) ? implode('、', $formData['delivery_place']) : (string)$formData['delivery_place'],
+        'item_detail' => $formData['item_detail'],
         'industry' => $formData['industry'],
         'message' => $formData['message'],
         'spam_score' => $spamResult['score'],
